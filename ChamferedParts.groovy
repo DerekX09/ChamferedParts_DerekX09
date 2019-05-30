@@ -44,7 +44,7 @@ public PropertyStorage getProperties(){
     }
 }
 class ParabolicDish extends Primitive {
-double Radius,  a;
+double Radius,  dishThickness,a;
 
     /** The properties. */
     private final PropertyStorage properties = new PropertyStorage();
@@ -53,12 +53,13 @@ public PropertyStorage getProperties(){
 }
 
     // from https://www.mathsisfun.com/geometry/parabola.html
-    public ParabolicDish(double Radius, double FocalLength) {
+    public ParabolicDish(double Radius, double FocalLength, double dishThickness) {
        this.Radius = Radius;
        if(Math.abs(FocalLength)==0){
        	throw new RuntimeException("A value in parabola must be non zero")
        }
        this.a=FocalLength;
+       this.dishThickness=dishThickness
     }
 
 	private double computeY(double x){
@@ -91,10 +92,13 @@ public PropertyStorage getProperties(){
 	CSG polygon = eu.mihosoft.vrl.v3d.ext.quickhull3d.HullUtil.hull(pointsOut)
 				//.rotx(90)
 				//.toZMin()
-	polygon=new Cylinder(Radius,polygon.getTotalY()-0.1).toCSG() 
+	double thickness = polygon.getTotalY()
+	CSG slug = new Cylinder(Radius+dishThickness,thickness+dishThickness*2).toCSG() 
 			.rotx(90)
-			.difference(	polygon)
-
+	polygon=polygon.union(slug.toYMin().movey(thickness))
+	polygon=slug
+			.difference(	polygon.movey(dishThickness))
+			.intersect(polygon)
 	return polygon.getPolygons();
     }
 }
@@ -159,5 +163,5 @@ new Parabola(5,-0.27,0,1).toCSG()
 	.move(20,20,0),
 new ParabolicCone(5,1.27,0).toCSG()
 	.move(30,30,0),
-	new ParabolicDish(10, 3).toCSG()
+	new ParabolicDish(20, 10,2).toCSG()
 ]
