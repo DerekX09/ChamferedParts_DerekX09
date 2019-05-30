@@ -93,7 +93,7 @@ public PropertyStorage getProperties(){
 				//.rotx(90)
 				//.toZMin()
 	double thickness = polygon.getTotalY()
-	CSG slug = new Cylinder(Radius+0.1,thickness+dishThickness*2).toCSG() 
+	CSG slug = new Cylinder(Radius+dishThickness,thickness+dishThickness*2).toCSG() 
 			.rotx(90)
 	polygon=polygon.union(slug.toYMin().movey(thickness))
 	polygon=slug
